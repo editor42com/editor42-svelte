@@ -1,25 +1,88 @@
-# Official TinyMCE Svelte component
+# Official Editor42 Svelte component
 
 ## About
 
-This package is a thin wrapper around [TinyMCE](https://github.com/tinymce/tinymce) to make it easier to use in a Svelte application.
+This package is a thin wrapper around [Editor42](https://github.com/editor42com/editor42),
+the auditable MIT fork of TinyMCE 6, to make it easier to use in a Svelte 5 application.
 
-* For the TinyMCE Svelte Quick Start, see: [TinyMCE Documentation - Svelte Integration](https://www.tiny.cloud/docs/tinymce/8/svelte-cloud/).
-* For a self-hosted setup using TinyMCE package with TinyMCE Svelte, see: [TinyMCE Documentation - TinyMCE package with Svelte](https://www.tiny.cloud/docs/tinymce/8/svelte-pm/).
-* For a self-hosted setup using TinyMCE .zip package with TinyMCE Svelte, see: [TinyMCE Documentation - TinyMCE .zip package with Svelte](https://www.tiny.cloud/docs/tinymce/8/svelte-zip/).
-* For the TinyMCE Svelte Technical Reference, see: [TinyMCE Documentation - TinyMCE Svelte Technical Reference](https://www.tiny.cloud/docs/tinymce/8/svelte-ref/).
-* For our quick demos, check out the TinyMCE Svelte [Storybook](https://tinymce.github.io/tinymce-svelte/).
+Documentation lives at [editor42.com](https://editor42.com/docs).
 
-### Supported Versions
+## Installation
 
-|`tinymce-svelte`         |Svelte         |
-|---                      |---            |
-|4.x                      |>= 5.x         |
-|<= 3.x                   |<= 5.x  (*)    |
+```sh
+npm install @editor42/editor42-svelte
+```
 
-- (*): Svelte 5 projects can use `tinymce-svelte` 3.x because Svelte 5 still supports the old Svelte 4 syntax.
+## Usage
 
+```svelte
+<script>
+  import Editor from '@editor42/editor42-svelte';
+</script>
 
-### Issues
+<Editor conf={{ height: 400 }} value="<p>Hello from Editor42</p>" />
+```
 
-Have you found an issue with tinymce-svelte or do you have a feature request? Open up an [issue](https://github.com/tinymce/tinymce-svelte/issues) and let us know or submit a [pull request](https://github.com/tinymce/tinymce-svelte/pulls). *Note: For issues concerning TinyMCE please visit the [TinyMCE repository](https://github.com/tinymce/tinymce).*
+With no extra props the editor script is loaded from `https://cdn.editor42.com` on the
+`latest` channel. There is no account, no sign-up and no key of any kind. The `latest`
+pointer only ever moves for security and bug-fix releases, because the Editor42 major
+version is fixed forever.
+
+## Self-hosting
+
+Point the component at your own copy of the script (the full file URL; editor42 and
+TinyMCE builds both work):
+
+```svelte
+<Editor scriptSrc="/js/editor42/editor42.min.js" />
+```
+
+## Pinning a version
+
+```svelte
+<Editor channel="42.0.0" />
+```
+
+`channel` accepts `latest`, a `latest-N` alias, or an exact version.
+
+## Editor options
+
+Everything else is an Editor42 option, passed through `conf`:
+
+```svelte
+<Editor conf={{ height: 400, menubar: false, plugins: 'lists link' }} />
+```
+
+See the [Editor42 documentation](https://editor42.com/docs) for the full list.
+
+## Migrating from the TinyMCE Svelte component
+
+```sh
+npm uninstall @tinymce/tinymce-svelte
+npm install @editor42/editor42-svelte
+```
+
+Change the import to `@editor42/editor42-svelte` and you are done. `scriptSrc`, `channel` and
+`conf` keep their names, and TinyMCE-style numeric channels resolve to `latest`.
+
+All API-key and licence-key handling has been removed. The corresponding props are still
+accepted so existing code compiles, but they do nothing: no key is read, stored or sent
+anywhere, and no request ever reaches a vendor cloud.
+
+The wrapper div class defaults to `editor42-wrapper` (it was `tinymce-wrapper`); set the
+`cssClass` prop if your styles target the old name.
+
+The component also drives a stock TinyMCE if that is what is already loaded on the page,
+which keeps the switch reversible. Configuring TinyMCE itself is outside the scope of
+this package.
+
+## Issues
+
+Found an issue or have a feature request? Open an
+[issue](https://github.com/editor42com/editor42-svelte/issues) or submit a pull request.
+For issues with the editor itself, use the
+[Editor42 repository](https://github.com/editor42com/editor42/issues).
+
+## License
+
+MIT. See [LICENSE.txt](LICENSE.txt).
