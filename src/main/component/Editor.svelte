@@ -69,10 +69,11 @@
   import { onDestroy, onMount } from 'svelte';
   import type { Editor42, Editor as Editor42Editor } from 'editor42';
 
-  import { bindHandlers, type EventHandlers } from './Utils';
+  import { bindHandlers, normalizeChannel, type EventHandlers } from './Utils';
 
   type EditorOptions = Parameters<Editor42['init']>[0];
-  type Channel = `${'4' | '5' | '6' | '7' | '8'}${'' | '-dev' | '-testing' | `.${number}` | `.${number}.${number}`}`;
+  type LegacyChannel = `${'4' | '5' | '6' | '7' | '8'}${'' | '-dev' | '-testing' | `.${number}` | `.${number}.${number}`}`;
+  type Channel = 'latest' | `latest-${number}` | `42.${number}` | `42.${number}.${number}` | LegacyChannel;
 
   export interface EditorProps extends Partial<EventHandlers> {
     id?: string; // default values
@@ -95,9 +96,10 @@
     inline = undefined,
     disabled = false,
     readonly = false,
-    apiKey = 'no-api-key',
+    // Removed: accepted so existing code compiles, never read or sent anywhere.
+    apiKey = undefined,
     licenseKey = undefined,
-    channel = '8',
+    channel = 'latest',
     scriptSrc = undefined,
     conf = {},
     modelEvents = 'change input undo redo',
@@ -160,7 +162,6 @@
       target: element,
       // eslint-disable-next-line no-nested-ternary
       inline: inline !== undefined ? inline : conf.inline !== undefined ? conf.inline : false,
-      license_key: licenseKey,
       setup: (editor: Editor42Editor) => {
         editor.on('PreInit', () => {
           setDisabled(editor, disabled);
@@ -194,7 +195,8 @@
     if (getEditor42() !== null) {
       init();
     } else {
-      const script = scriptSrc ? scriptSrc : `https://cdn.tiny.cloud/1/${apiKey}/tinymce/${channel}/tinymce.min.js`;
+      // with no scriptSrc the script comes from the editor42 cdn, no key of any kind
+      const script = scriptSrc ? scriptSrc : `https://cdn.editor42.com/editor42/${normalizeChannel(channel)}/editor42.min.js`;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       scriptLoader.load(container!.ownerDocument, script, () => {
         init();

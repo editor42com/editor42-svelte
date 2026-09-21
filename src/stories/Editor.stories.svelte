@@ -3,8 +3,6 @@
 
   import Editor, { type EditorProps } from '../main/component/Editor.svelte';
   import { validEvents } from '../main/component/Utils';
-
-  const apiKey = 'prsghhxax677rv082a1zj9b7cgjuoaqysf7h8ayxi5ao43ha';
   const content = `
           <h2 style="text-align: center;">
           TinyMCE provides a <span style="text-decoration: underline;">full-featured</span>rich text editing experience, and a featherweight download.
@@ -24,13 +22,12 @@
   const toggleReadonly = () => {
     readonly = !readonly;
   };
-  const controls = { channel: '8' };
+  const controls = { channel: 'latest' };
   const { Story } = defineMeta({
     title: 'Editor',
     component: Editor,
     args: {
       ...controls,
-      apiKey,
       inline: false
     } as EditorProps
   });
@@ -80,7 +77,7 @@
 <Story name="Text binding" >
   {#snippet template(args)}
     <div>
-      <Editor {apiKey} bind:value bind:text {...args}/>
+      <Editor bind:value bind:text {...args}/>
       <div>{text}</div>
       <div>{@html value}</div>
       <textarea style="width:100%;height:200px" bind:value={text}></textarea>

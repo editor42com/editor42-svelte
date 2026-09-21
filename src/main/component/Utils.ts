@@ -82,3 +82,16 @@ export const bindHandlers = (editor: Editor, eventHandlers: Partial<EventHandler
     });
   });
 };
+// TinyMCE-style numeric channels have no meaning on cdn.editor42.com. Migrated code that
+// pinned one gets the stable 'latest' alias instead: the 42 major never breaks by policy.
+export const normalizeChannel = (channel: string | undefined): string => {
+  if (channel === undefined || channel === '') {
+    return 'latest';
+  }
+  if (/^[4-8]([.-]|$)/.test(channel)) {
+    // eslint-disable-next-line no-console
+    console.warn(`editor42-svelte: channel '${channel}' is a TinyMCE channel; loading 'latest' instead.`);
+    return 'latest';
+  }
+  return channel;
+};
