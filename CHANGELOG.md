@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-21
+
+### Changed
+- Forked @tinymce/tinymce-svelte 4.0.1 as @editor42/editor42-svelte, targeting Editor42, and cherry-picked the upstream bedrock test harness that landed after the release.
+- Renamed the identifiers this component looks for: it resolves the editor42 global and falls back to a stock TinyMCE when that is what the page has loaded.
+- scriptSrc, channel and conf keep their upstream names; the no-src fallback loads from https://cdn.editor42.com on the latest channel and TinyMCE-style numeric channels resolve to latest.
+- The wrapper div class defaults to editor42-wrapper.
+
+### Removed
+- All API-key and licence-key handling. The props are still accepted so existing code compiles, but no key is read, stored or sent, and no request reaches a vendor cloud.
+- Vendor CI, release tooling and the vendor cloud test matrix.
+
 ## 4.0.1 - 2026-04-24
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "name": "@editor42/editor42-svelte",
-  "version": "4.0.1",
+  "version": "1.0.0",
   "description": "Official Editor42 Svelte Component",
   "private": false,
   "publishConfig": {
