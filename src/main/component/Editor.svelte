@@ -1,16 +1,15 @@
 <!--
   @component
 
-  @see {@link https://www.tiny.cloud/docs/tinymce/7/svelte-ref/} for the TinyMCE Svelte Technical Reference.
 -->
 
 <script lang="ts" module>
-  declare let global: { tinymce: TinyMCE };
-  declare let window: Window & { tinymce: TinyMCE };
+  declare let global: { editor42?: Editor42; tinymce?: Editor42 };
+  declare let window: Window & { editor42?: Editor42; tinymce?: Editor42 };
 
   const uuid = (prefix: string): string => prefix + '_' + Math.floor(Math.random() * 1000000000) + String(Date.now());
 
-  const isDisabledOptionSupported = (editor: TinyMCEEditor): boolean => typeof editor.options.set === 'function' && editor.options.isRegistered('disabled');
+  const isDisabledOptionSupported = (editor: Editor42Editor): boolean => typeof editor.options.set === 'function' && editor.options.isRegistered('disabled');
 
   const createScriptLoader = () => {
     let state: {
@@ -20,7 +19,7 @@
       injected: boolean;
     } = {
       listeners: [],
-      scriptId: uuid('tiny-script'),
+      scriptId: uuid('editor42-script'),
       scriptLoaded: false,
       injected: false
     };
@@ -59,15 +58,20 @@
     };
   };
   let scriptLoader = createScriptLoader();
+
+  // Only to be used by tests.
+  export const reinitializeScriptLoader = (): void => {
+    scriptLoader = createScriptLoader();
+  };
 </script>
 
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import type { TinyMCE, Editor as TinyMCEEditor } from 'tinymce';
+  import type { Editor42, Editor as Editor42Editor } from 'editor42';
 
   import { bindHandlers, type EventHandlers } from './Utils';
 
-  type EditorOptions = Parameters<TinyMCE['init']>[0];
+  type EditorOptions = Parameters<Editor42['init']>[0];
   type Channel = `${'4' | '5' | '6' | '7' | '8'}${'' | '-dev' | '-testing' | `.${number}` | `.${number}.${number}`}`;
 
   export interface EditorProps extends Partial<EventHandlers> {
@@ -87,7 +91,7 @@
   }
 
   let {
-    id = uuid('tinymce-svelte'),
+    id = uuid('editor42-svelte'),
     inline = undefined,
     disabled = false,
     readonly = false,
@@ -99,13 +103,13 @@
     modelEvents = 'change input undo redo',
     value = $bindable(''),
     text = $bindable(''),
-    cssClass = 'tinymce-wrapper',
+    cssClass = 'editor42-wrapper',
     ...eventHandlers
   }: EditorProps = $props();
   let container: HTMLElement | undefined;
   // svelte-ignore non_reactive_update
   let element: HTMLElement | undefined;
-  let editorRef: TinyMCEEditor | undefined = $state();
+  let editorRef: Editor42Editor | undefined = $state();
   // The following three variables are not meant to be reactive, but we need to track them to avoid unnecessary editor updates.
   let lastVal = $state.snapshot(value);
   // svelte-ignore state_referenced_locally
@@ -113,13 +117,13 @@
   // svelte-ignore state_referenced_locally
   let readonlyCache = $state.snapshot(readonly);
 
-  const setReadonly = (editor: TinyMCEEditor, readonlyValue: boolean) => {
+  const setReadonly = (editor: Editor42Editor, readonlyValue: boolean) => {
     if (typeof editor.mode?.set === 'function') {
       editor.mode.set(readonlyValue ? 'readonly' : 'design');
     }
   };
 
-  const setDisabled = (editor: TinyMCEEditor, disabledValue: boolean) => {
+  const setDisabled = (editor: Editor42Editor, disabledValue: boolean) => {
     if (isDisabledOptionSupported(editor)) {
       editor.options.set('disabled', disabledValue);
     } else {
@@ -142,10 +146,12 @@
     }
   });
 
-  const getTinymce = (): TinyMCE | null => {
-    const getSink = (): { tinymce: TinyMCE } => typeof window !== 'undefined' ? window : global;
+  // Resolve the engine global. Editor42 wins when both engines are on the page; a real
+  // TinyMCE is a supported fallback so this component can drive either engine.
+  const getEditor42 = (): Editor42 | null => {
+    const getSink = (): { editor42?: Editor42; tinymce?: Editor42 } => typeof window !== 'undefined' ? window : global;
     const sink = getSink();
-    return sink && sink.tinymce ? sink.tinymce : null;
+    return sink?.editor42 ?? sink?.tinymce ?? null;
   };
 
   const init = () => {
@@ -155,7 +161,7 @@
       // eslint-disable-next-line no-nested-ternary
       inline: inline !== undefined ? inline : conf.inline !== undefined ? conf.inline : false,
       license_key: licenseKey,
-      setup: (editor: TinyMCEEditor) => {
+      setup: (editor: Editor42Editor) => {
         editor.on('PreInit', () => {
           setDisabled(editor, disabled);
           setReadonly(editor, readonly);
@@ -181,11 +187,11 @@
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     element!.style.visibility = '';
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    void getTinymce()?.init(finalInit);
+    void getEditor42()?.init(finalInit);
   };
 
   onMount(() => {
-    if (getTinymce() !== null) {
+    if (getEditor42() !== null) {
       init();
     } else {
       const script = scriptSrc ? scriptSrc : `https://cdn.tiny.cloud/1/${apiKey}/tinymce/${channel}/tinymce.min.js`;
@@ -198,7 +204,7 @@
 
   onDestroy(() => {
     if (editorRef) {
-      getTinymce()?.remove(editorRef);
+      getEditor42()?.remove(editorRef);
     }
   });
 </script>

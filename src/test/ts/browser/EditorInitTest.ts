@@ -3,16 +3,16 @@ import { context, describe, it } from '@ephox/bedrock-client';
 import { TinyAssertions } from '@ephox/mcagar';
 
 import * as Loader from '../alien/Loader';
-import { VALID_API_KEY, VERSIONS } from '../alien/TestHelpers';
+import { ENGINES } from '../alien/TestHelpers';
 
 const assertProperty = (obj: object, propName: string, expected: unknown) => {
   Assertions.assertEq(`${propName} should be ${expected}`, expected, (obj as Record<string, unknown>)[propName]);
 };
 
 describe('EditorInitTest', () => {
-  VERSIONS.forEach((version) =>
+  ENGINES.forEach((version) =>
     Loader.withVersion(version, (render) => {
-      const defaultProps: Loader.EditorProps = { apiKey: VALID_API_KEY };
+      const defaultProps: Loader.EditorProps = {};
 
       context('inline prop controls element tag', () => {
         it('TINYINT-3437: Uses textarea by default (iframe mode)', async () => {
@@ -35,9 +35,9 @@ describe('EditorInitTest', () => {
         it('TINYINT-3437: Is auto-generated as uuid when not provided', async () => {
           using ctx = await render(defaultProps);
           Assertions.assertEq(
-            'id should be a uuid starting with tinymce-svelte',
+            'id should be a uuid starting with editor42-svelte',
             true,
-            typeof ctx.DOMNode.id === 'string' && ctx.DOMNode.id.startsWith('tinymce-svelte_')
+            typeof ctx.DOMNode.id === 'string' && ctx.DOMNode.id.startsWith('editor42-svelte_')
           );
         });
       });

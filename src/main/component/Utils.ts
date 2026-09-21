@@ -1,4 +1,4 @@
-import type { Editor, TinyMCE } from 'tinymce';
+import type { Editor, Editor42 } from 'editor42';
 
 export const validEvents = [
   'Activate',
@@ -72,7 +72,7 @@ export const validEvents = [
 
 export type ValidEventTypes = Lowercase<typeof validEvents[number]>;
 export type EventHandlers = {
-  [K in ValidEventTypes]: (event: any, editor: TinyMCE) => void;
+  [K in ValidEventTypes]: (event: any, editor: Editor42) => void;
 };
 
 export const bindHandlers = (editor: Editor, eventHandlers: Partial<EventHandlers>): void => {

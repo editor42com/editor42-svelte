@@ -34,9 +34,12 @@
     "prepublishOnly": "yarn run build"
   },
   "keywords": [
+    "editor42",
     "tinymce",
     "svelte",
-    "component"
+    "wysiwyg",
+    "rich text editor",
+    "editor"
   ],
   "author": "Editor42 contributors",
   "license": "MIT",
@@ -48,10 +51,14 @@
     "LICENSE.txt"
   ],
   "peerDependencies": {
+    "editor42": "*",
     "svelte": "^5.0.0",
     "tinymce": "^8.0.0 || ^7.0.0 || ^6.0.0 || ^5.0.0"
   },
   "peerDependenciesMeta": {
+    "editor42": {
+      "optional": true
+    },
     "tinymce": {
       "optional": true
     }

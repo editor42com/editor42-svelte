@@ -4,6 +4,22 @@ import { context, describe, it } from '@ephox/bedrock-client';
 import * as Loader from '../alien/Loader';
 
 describe('EditorDisabledTest', () => {
+  // editor42 is built on the 6.x core: no 'disabled' option, mode toggling applies.
+  context('with Editor42', () => {
+    Loader.withVersion('editor42', (render) => {
+      it('Updating disabled prop should toggle the editor\'s mode', async () => {
+        using ctx = await render({
+          disabled: true
+        });
+        Assertions.assertEq('mode is readonly', 'readonly', ctx.editor.mode.get());
+        ctx.setProps({ disabled: false });
+        await Waiter.pTryUntil('mode is changed to design', () => {
+          Assertions.assertEq('mode is design', 'design', ctx.editor.mode.get());
+        });
+      });
+    });
+  });
+
   context('with TinyMCE < 7.6', () => {
     Loader.withVersion('7.5', (render) => {
       it('TINYINT-3437: Updating disabled prop should toggle the editor\'s mode', async () => {
